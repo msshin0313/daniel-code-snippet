@@ -1,23 +1,22 @@
 <?php
 
 function doforum_menu() {
-  $items['doforum/%'] = array(
+  $items['doforum/tag'] = array(
     'title' => 'D.O. forum post tagging interface',
-    'page callback' => 'doforum_display',
-    'page arguments' => array(1),
+    'page callback' => 'doforum_tag',
+    //'page arguments' => array(1),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK
   );
   
+  $items['doforum/autocomplete'] = array(
+  	'title' => 'Autocomplete for module names',
+  	'page callback' => 'doforum_autocomplete',
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK
+  );
+  
   return $items;
-}
-
-function doforum_display($action = 'tag') {
-  switch ($action) {
-    case 'tag':
-      return doforum_tag();
-  }
-  return '';
 }
 
 function doforum_tag() {
@@ -56,16 +55,12 @@ function doforum_tagform() {
   	if ($post->cid!=0) {
   		$url = $url."#comment-{$post->cid}";
   	}
+  	$box = theme_box(l($post->title, $url), $post->body);
   	
-  	$form['tagging'][$post->nid][$post->cid]['title'] = array(
+  	$form['tagging'][$post->nid][$post->cid]['box'] = array(
       '#type' => 'markup',
-      '#value' => "<h2>".l($post->title, $url)."</h2>",
+      '#value' => $box
     );
-    
-    $form['tagging'][$post->nid][$post->cid]['body'] = array(
-      '#type' => 'markup',
-      '#value' => $post->body,
-	);
 	
 	db_set_active('pivots_analysis');
 	$projects = db_query("SELECT DISTINCT title FROM project p INNER JOIN pivots_match m ON p.nid=m.src_id " .
@@ -81,7 +76,8 @@ function doforum_tagform() {
         '#type' => 'textfield',
         '#title' => "Modules mentioned",
         '#default_value' => $default_tags,
-        '#description' => "Format: modulename[alias], or ~[alias]. Case-sensitive please."
+        '#description' => "Format: modulename[alias], or ~[alias]. Case-sensitive please.",
+        '#autocomplete_path' => 'doforum/autocomplete'
     );
     $form['tagging'][$post->nid][$post->cid]['suffix'] = array(
         '#type' => 'markup',
@@ -121,5 +117,40 @@ function doforum_tagform_submit($form, &$form_state) {
   $form_state['redirect'] = 'doforum/tag';
 }
 
+/* function doforum_autocomplete($string) {
+	$projects = array();
+	db_set_active('pivots_analysis');
+	$results = db_query("SELECT title FROM project p INNER JOIN project_usage u ON p.nid=u.nid WHERE title like '%%%s%%' ORDER BY title LIMIT 10", $string);
+	db_set_active();
+	while ($project = db_fetch_object($results)) {
+		$projects[$project->title] = check_plain($project->title);
+	}
+	print drupal_json($projects);
+}*/
+
+function doforum_autocomplete($string) {
+  $array = drupal_explode_tags($string);
+
+  // Fetch last tag
+  $last_string = trim(array_pop($array));
+  $matches = array();
+  if ($last_string != '') {
+  	db_set_active('pivots_analysis');
+    $result = db_query("SELECT title as name FROM project p INNER JOIN project_usage u ON p.nid=u.nid WHERE title like '%%%s%%' ORDER BY title LIMIT 10", $last_string);
+	db_set_active();
+    
+    $prefix = count($array) ? implode(', ', $array) .', ' : '';
+
+    while ($tag = db_fetch_object($result)) {
+      $n = $tag->name;
+      // Commas and quotes in terms are special cases, so encode 'em.
+      if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
+        $n = '"'. str_replace('"', '""', $tag->name) .'"';
+      }
+      $matches[$prefix . $n] = check_plain($tag->name);
+    }
+  }
+  drupal_json($matches);
+}
 
 ?>
