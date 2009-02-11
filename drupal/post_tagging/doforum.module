@@ -62,15 +62,20 @@ function doforum_tagform() {
       '#value' => $box
     );
 	
-	db_set_active('pivots_analysis');
-	$projects = db_query("SELECT DISTINCT title FROM project p INNER JOIN pivots_match m ON p.nid=m.src_id " .
-			"WHERE pivot_id=4151 AND dest_id=%d AND a1=%d", $post->nid, $post->cid);
+    db_set_active('pivots_analysis');
+	$default_tags = db_result(db_query("SELECT tags FROM manual_tags WHERE nid=%d and cid=%d ORDER BY timestamp DESC LIMIT 1", $post->nid, $post->cid));
 	db_set_active();
-	$tags_array = array();
-	while ($p = db_fetch_object($projects)) {
-		$tags_array[] = $p->title."[]";
-	}
-	$default_tags = implode(", ", $tags_array);
+    if (!isset($default_tags) || empty($default_tags)) {
+        db_set_active('pivots_analysis');
+        $projects = db_query("SELECT DISTINCT title FROM project p INNER JOIN pivots_match m ON p.nid=m.src_id " .
+                "WHERE pivot_id=4151 AND dest_id=%d AND a1=%d", $post->nid, $post->cid);
+        db_set_active();
+        $tags_array = array();
+        while ($p = db_fetch_object($projects)) {
+            $tags_array[] = $p->title."[]";
+        }
+        $default_tags = implode(", ", $tags_array);
+    }
 	
     $form['tagging'][$post->nid][$post->cid]['tags'] = array(
         '#type' => 'textfield',
@@ -136,7 +141,7 @@ function doforum_autocomplete($string) {
   $matches = array();
   if ($last_string != '') {
   	db_set_active('pivots_analysis');
-    $result = db_query("SELECT title as name FROM project p INNER JOIN project_usage u ON p.nid=u.nid WHERE title like '%%%s%%' ORDER BY title LIMIT 10", $last_string);
+    $result = db_query("SELECT title as name FROM project p INNER JOIN project_usage u ON p.nid=u.nid WHERE title like '%%%s%%' ORDER BY rank asc LIMIT 10", $last_string);
 	db_set_active();
     
     $prefix = count($array) ? implode(', ', $array) .', ' : '';
