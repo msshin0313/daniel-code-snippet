@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     JML Release Build
+
+     Build Requirements:
+        * JDK 1.5 or higher
+
+     Roger Chen
+     Daniel Henninger
+     ====================================================================== -->
+
+<project name="JML" default="all" basedir="..">
+
+    <description>
+        Java MSN Messenger library build script.
+    </description>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          global properties
+         - - - - - - - - - - - - - - - - - -->
+    <!-- API version -->
+    <property name="release" value="1.0b3" />
+
+    <!-- Compile for 1.5 -->
+    <property name="j_target" value="1.5" />
+
+    <!-- Root directories for the source code -->
+    <property name="build" location="${basedir}/build" />
+    <property name="src" location="${basedir}/src" />
+    <property name="resource" location="${basedir}/resource" />
+    <property name="lib" location="${basedir}/lib" />
+    <property name="example" location="${basedir}/example" />
+    <property name="documentation" location="${basedir}/documentation" />
+
+    <!-- Dump the Jars here -->
+    <property name="dist" location="${basedir}/dist" />
+    <property name="dist.src" value="${dist}/jml-src-${release}.zip" />
+    <property name="dist.jar" value="${dist}/jml-${release}.jar" />
+    <property name="dist.full.jar" value="${dist}/jml-${release}-full.jar" />
+
+    <!-- Work directory -->
+    <property name="work" location="${basedir}/classes" />
+
+    <!-- Generate the javadoc here -->
+    <property name="javadoc.location" location="${basedir}/javadoc/" />
+
+
+    <!-- - - - - - - - - - - - - - - - - -
+          target: all
+         - - - - - - - - - - - - - - - - - -->
+	<target name="all" depends="zip-src, jar, jar-full" description="Build all of the various distribution pieces of JML">
+
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="init" description="Set up build environment.">
+		<tstamp />
+
+        <mkdir dir="${work}" />
+        <mkdir dir="${dist}" />
+
+        <path id="build.classpath">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+	</target>
+
+
+    <!-- - - - - - - - - - - - - - - - - -
+          target: clean
+         - - - - - - - - - - - - - - - - - -->
+    <target name="clean" description="Clean up from previous builds.">
+        <delete dir="${work}" />
+        <delete dir="${dist}" />
+    </target>
+
+
+    <!-- - - - - - - - - - - - - - - - - -
+          target: compile
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compile" description="Compile java code.">
+	<mkdir dir="${work}" />
+	<javac srcdir="${src}" destdir="${work}" source="${j_target}" target="${j_target}" debug="true" debuglevel="source,lines">
+		<classpath refid="build.classpath" />
+	</javac>
+    </target>
+
+
+    <!-- - - - - - - - - - - - - - - - - -
+          target: zip-src                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="zip-src" depends="init, javadoc" description="Generate ZIP file of source, examples, and required libraries.">
+		<delete file="${dist.src}" />
+        
+        <zip destfile="${dist.src}">
+			<fileset dir="${basedir}">
+				<include name="src/**" />
+				<include name="example/**" />
+                <include name="lib/*.jar" />
+                <include name="build/build.xml" />
+                <include name="documentation/**" />
+                <include name="javadoc/**" />
+                <include name="test/**" />
+                <include name="resource/**" />
+            </fileset>
+        </zip>
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - -
+          target: jar                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="jar" depends="init,compile" description="Generate main distribution jar file.">
+		<delete file="${dist.jar}" />
+		<jar destfile="${dist.jar}" basedir="${work}" />
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - -
+          target: jar w/ depends          
+         - - - - - - - - - - - - - - - - - -->
+	<target name="jar-full" depends="init,compile" description="Generate main distribution jar file, including dependencies.">
+		<delete file="${dist.full.jar}" />
+		<jar destfile="${dist.full.jar}">
+			<zipfileset dir="classes" prefix="" />
+                	<zipfileset src="lib/commons-logging.jar" />
+                	<zipfileset src="lib/cindy.jar" />
+		</jar>
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: javadoc                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="javadoc" depends="init" description="Generate javadoc documentation for JML.">
+        <mkdir dir="${javadoc.location}" />
+        <javadoc
+            packagenames="net.sf.jml.*"
+            destdir="${javadoc.location}"
+            windowtitle="Java MSN Messenger Library Javadoc"
+            overview="${src}/overview.html"
+            failonerror="yes"
+            >
+            <sourcepath>
+                <path location="${src}"/>
+            </sourcepath>
+            <doctitle>Java MSN Messenger Library ${dist.version} Javadoc</doctitle>
+            <header>JML</header>
+            <classpath>
+                <path>
+    				<fileset dir="${lib}" includes="*.jar" />
+                </path>
+            </classpath>
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+        </javadoc>
+    </target>
+
+</project>
+

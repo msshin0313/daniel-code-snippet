@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module relativePaths="true" type="JAVA_MODULE" version="4">
+  <component name="BuildJarSettings">
+    <containerInfo>
+      <containerElement type="module" name="core">
+        <attribute name="method" value="1" />
+        <attribute name="URI" value="/" />
+      </containerElement>
+    </containerInfo>
+    <setting name="jarUrl" value="file://$MODULE_DIR$/core.jar" />
+    <setting name="buildJar" value="true" />
+    <setting name="mainClass" value="edu.umich.si.cms.pivots.lucene.CmdControl" />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="commons" level="application" />
+    <orderEntry type="library" exported="" name="lucene-2.2" level="application" />
+    <orderEntry type="library" exported="" name="mysql-jdbc" level="application" />
+    <orderEntryProperties />
+  </component>
+</module>
+
