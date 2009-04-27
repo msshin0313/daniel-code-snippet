@@ -21,7 +21,6 @@
     <orderEntry type="library" exported="" name="commons" level="application" />
     <orderEntry type="library" exported="" name="lucene-2.2" level="application" />
     <orderEntry type="library" exported="" name="mysql-jdbc" level="application" />
-    <orderEntryProperties />
   </component>
 </module>
 
