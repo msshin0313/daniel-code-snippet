@@ -46,9 +46,9 @@ function solrmlt_suggestions($block_id, $nid) {
 
 // assume we have project_top100 and mlt_relation tables
 function solrmlt_run() {
-  $block_id = 0;
+  $block_id = 1;
   $results = db_query("SELECT nid FROM {project_top100}");
-  while ($project = db_fectch_array($results)) {
+  while ($project = db_fetch_array($results)) {
     $nid = $project['nid'];
     $items = solrmlt_suggestions($block_id, $nid);
     foreach ($items as $item) {
