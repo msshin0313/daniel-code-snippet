@@ -13,6 +13,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="groovy-1.6.3" level="application" />
+    <orderEntry type="library" name="mysql-jdbc" level="application" />
+    <orderEntry type="module" module-name="mahout" />
   </component>
 </module>
 
