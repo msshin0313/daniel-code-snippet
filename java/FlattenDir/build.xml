@@ -5,13 +5,13 @@
 
     <target name="compile">
         <!-- Compile the java code from ${src} into ${classes} -->
-        <javac srcdir="${src}" destdir="${classes}" source="1.5"/>
+        <javac srcdir="${src}" destdir="${classes}" source="1.5" classpath="../../+lib/classes/"/>
     </target>
     <target name="jar">
         <delete file="${destjar}"/>
         <!-- note that to excludes a directory, you must append a '/' in the end of the dirname-->
         <jar destfile="${destjar}" basedir="${classes}" excludes=".dependency-info/">
-            <fileset dir="../../lib/classes/" excludes=".dependency-info/"/>
+            <fileset dir="../../+lib/classes/" excludes=".dependency-info/"/>
             <manifest>
                 <attribute name="Built-By" value="Cobra"/>
                 <attribute name="Main-Class" value="magicstudio.flattendir.FlattenDir"/>  

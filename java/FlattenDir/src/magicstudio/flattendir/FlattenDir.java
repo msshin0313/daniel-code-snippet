@@ -32,13 +32,13 @@ public class FlattenDir {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // needs Windows environment in this version
-        if (System.getProperty("os.name").toLowerCase().indexOf("windows") == -1) {
+        /*if (System.getProperty("os.name").toLowerCase().indexOf("windows") == -1) {
             JOptionPane.showMessageDialog(frame,
                     "Your OS is: " + System.getProperty("os.name") +
                     "\nPlease run under Windows",
                     "System Requirment", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
-        }
+        }*/
 
         frame.pack();
         frame.setVisible(true);
