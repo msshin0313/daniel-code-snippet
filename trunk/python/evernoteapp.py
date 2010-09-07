@@ -15,12 +15,14 @@ import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
 import evernote.edam.notestore.ttypes as NoteStoreTypes
 
+SANDBOX = False
+
 class EvernoteApp:
 
   def __init__(self):
     config = ConfigParser.ConfigParser()
     config.read('settings.cfg')
-    section = 'evernote_sandbox'
+    section = 'evernote_sandbox' if SANDBOX else 'evernote'
     c = lambda x: config.get(section, x)
 
     # access user store
@@ -59,6 +61,7 @@ class EvernoteApp:
       print "**", notebook.name, '--', notebook.guid
       #if notebook.defaultNotebook:
       #    defaultNotebook = notebook
+    print 'done.'
 
 
 class CreateImageNote(EvernoteApp):
@@ -97,8 +100,15 @@ class CreateImageNote(EvernoteApp):
 
 
 class ListNotes(EvernoteApp):
+  notebookTitle = ''
   def runTask(self):
-    notebook = self.noteStore.getDefaultNotebook(self.authToken)
+    if (len(self.notebookTitle) == 0 ):
+      notebook = self.noteStore.getDefaultNotebook(self.authToken)
+    else:
+      notebookList = self.noteStore.listNotebooks(self.authToken)
+      for notebook in notebookList:
+        if notebook.name.find(self.notebookTitle) != -1:
+          break
     filter = NoteStoreTypes.NoteFilter()
     filter.notebookGuid = notebook.guid
     noteList = self.noteStore.findNotes(self.authToken, filter, 0, 10)
@@ -109,7 +119,38 @@ class ListNotes(EvernoteApp):
       #print note.contentLength
 
 
+class DisplayNoteContent(EvernoteApp):
+  noteTitle = ''
+  maxNotes = 10
+
+  def runTask(self):
+    filter = NoteStoreTypes.NoteFilter()
+    filter.words = self.noteTitle
+    noteList = self.noteStore.findNotes(self.authToken, filter, 0, self.maxNotes)
+    if noteList.totalNotes > self.maxNotes:
+      raise Exception("Notes returned exceed max. Please refine search criteria.")
+
+    notesAll = noteList.notes
+    notesValid = []
+    for note in notesAll:
+      if note.title.find(self.noteTitle.strip('"')) != -1:
+        notesValid.append(note)
+
+    if len(notesValid) > 1:
+      print "The %d notes below satisfy search criteria. Please refine search '%s'" % (len(notesValid), self.noteTitle)
+      for note in notesValid:
+        print note.guid, '-', note.title
+    else:
+      note = notesValid[0]
+      print note.guid, '-', note.title
+      print '*'*40
+      print self.noteStore.getNoteContent(self.authToken, note.guid)
+
+
+
+
 if __name__ == '__main__':
-  app = ListNotes()
+  app = DisplayNoteContent()
+  app.noteTitle = '"FIRST THINGS FIRST"'
   app.runTask()
 

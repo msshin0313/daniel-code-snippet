@@ -5,6 +5,7 @@ from random import sample
 from shutil import copy
 from os.path import isdir, basename
 from fnmatch import fnmatch
+import random
 
 
 # p and q are lists of discrete random variable distributions.
@@ -86,6 +87,34 @@ def count_lines(dir, pattern):
       file.close()
   print "total line numbers", linecount, "in", filecount, "files"
 
+
+# return a random number between [0, len(pdf)], according to the probability given by pdf
+def multinomial_distribution(pdf):
+  if sum(pdf) != 1:
+    pdf = [float(i)/sum(pdf) for i in pdf]
+  assert sum(pdf) == 1
+  r = random.random()
+  for i in range(len(pdf)):
+    if r < pdf[i]:
+      return i
+    else:
+      r = r - pdf[i]
+  assert False
+
+
+def simulate_random_guess():
+  trials = 1000000
+  pool = [0 for i in range(37)] + [1 for i in range(3)] + [2 for i in range(181)] + [3 for i in range(57)]
+  simulation = []
+  guess = []
+  for i in range(trials):
+    simulation.append(random.choice(pool))
+    #guess.append(random.randint(0,3))
+    guess.append(random.choice(pool))
+  correct = [t[0]==t[1] for t in zip(simulation, guess)].count(True)
+  print "Correct guesses: %3.2f%%" % (float(correct)/trials*100)
+
+
 if __name__ == '__main__':
   #p = [0.5, 0.1, 0.4]
   #q = [0.2, 0.5, 0.3]
@@ -96,4 +125,6 @@ if __name__ == '__main__':
   #random_sample_files([r+'tiger-txt', r+'milk-txt'], r+'random70', 70)
   
   #remove_empty_lines('../data/termsusage_v2.1.txt')
-  count_lines(r'D:\Work\+project\balance\digg_cls\classification_algorithm', '*.m')
+  #count_lines(r'D:\Work\+project\balance\digg_cls\classification_algorithm', '*.m')
+  #simulate_random_guess()
+  for i in range(100): print multinomial_distribution([0.02, 0.48, 0.0001, 0.4999])
