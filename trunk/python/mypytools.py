@@ -161,6 +161,11 @@ def inner_join(t1, t2):
       rows.append((id, d1[id], data2))
   return rows
 
+def dedup(alist):
+  pool = set()
+  for i in alist:
+    pool.add(i)
+  return list(pool)
 
 
 if __name__ == '__main__':
