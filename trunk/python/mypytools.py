@@ -1,5 +1,4 @@
 # for jython use: remove the encoding gbk. otherwise, add it.
-# encoding: gbk
 import random, csv, math, shutil, os, fnmatch, os.path
 
 # p and q are lists of discrete random variable distributions.
@@ -122,7 +121,8 @@ def write_csv(filename, header, rows):
 
 # colselector is a list column#
 def read_csv(filename, header=None, rowfilter=lambda x: True, colselector=None):
-  assert all([i in range(len(header)) for i in colselector])
+  if colselector != None:
+    assert all([i in range(len(header)) for i in colselector])
   f = open(filename, 'r')
   reader = csv.reader(f)
   firstline = reader.next()
