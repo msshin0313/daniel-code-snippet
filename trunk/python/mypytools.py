@@ -117,7 +117,7 @@ def write_csv(filename, header, rows):
     assert len(row) == len(header), "header %s, row %s" % (str(header), str(row))
     writer.writerow(row)
   f.close()
-  print "Successfully wrote to CSV file:", filename, len(rows)
+  #print "Successfully wrote to CSV file:", filename, len(rows)
 
 # colselector is a list column#
 def read_csv(filename, header=None, rowfilter=lambda x: True, colselector=None):
@@ -135,7 +135,7 @@ def read_csv(filename, header=None, rowfilter=lambda x: True, colselector=None):
         rows.append(row)
       else:
         rows.append(tuple([row[i] for i in colselector]))
-  print "Successfully read CSV file:", filename, len(rows)
+  #print "Successfully read CSV file:", filename, len(rows)
   f.close()
   return rows
 
