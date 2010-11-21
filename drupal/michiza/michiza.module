@@ -35,3 +35,21 @@ function michiza_cron() {
 	$quote = db_result(db_query("SELECT title FROM {node} WHERE status=1 AND type='quotes' ORDER BY rand() LIMIT 1"));
 	variable_set('site_slogan', $quote);
 }
+
+
+function michiza_comment($a1, $op) {
+  global $user;
+
+  switch ($op) {
+        case "validate":
+          //check if anonymous user
+      if (!$user->uid) {
+        //the checks are derived from the filter module > _filter_url method
+        if (preg_match("@(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)+@se", $a1["comment"]) || preg_match("@(www\.[a-zA-Z0-9\@:%_+*~#?&=.,/;-]*[a-zA-Z0-9\@:%_+~#\&=/;-])+@se", $a1["comment"])) {
+          form_set_error("comment", t("Please eliminate URLs in your comment, or log in to post links. This is an anti-spam measure. Thanks."));
+        }
+      }
+          break;
+  }
+}
+
