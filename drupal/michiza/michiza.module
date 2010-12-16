@@ -1,7 +1,18 @@
 <?php
 
+/**
+ * preserve RSS for 100 years. "Forever" will be an option in D7
+ */
 function michiza_form_aggregator_admin_settings_alter(&$form, &$form_state) {
     $form['aggregator_clear']['#options'][3153600000]  = "100 years";                  
+}
+
+/**
+ * Hide "email", "homepage" in the "post new comments" form to prevent spam
+ */
+function michiza_form_comment_form_alter(&$form, &$form_state) {
+    unset($form['mail']);
+    unset($form['homepage']);
 }
 
 /**
@@ -45,8 +56,10 @@ function michiza_comment($a1, $op) {
           //check if anonymous user
       if (!$user->uid) {
         //the checks are derived from the filter module > _filter_url method
-        if (preg_match("@(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)+@se", $a1["comment"]) || preg_match("@(www\.[a-zA-Z0-9\@:%_+*~#?&=.,/;-]*[a-zA-Z0-9\@:%_+~#\&=/;-])+@se", $a1["comment"])) {
-          form_set_error("comment", t("Please eliminate URLs in your comment, or log in to post links. This is an anti-spam measure. Thanks."));
+        if (preg_match("@(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)+@se", $a1["comment"]) || preg_match("@(www\.[a-zA-Z0-9\@:%_+*~#?&=.,/;-]*[a-zA-Z0-9\@:%_+~#\&=/;-])+@se", $a1["comment"]) 
+            || preg_match("@(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)+@se", $a1["subject"]) || preg_match("@(www\.[a-zA-Z0-9\@:%_+*~#?&=.,/;-]*[a-zA-Z0-9\@:%_+~#\&=/;-])+@se", $a1["subject"])
+            || preg_match("@(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)+@se", $a1["name"]) || preg_match("@(www\.[a-zA-Z0-9\@:%_+*~#?&=.,/;-]*[a-zA-Z0-9\@:%_+~#\&=/;-])+@se", $a1["name"])) {
+          form_set_error("comment", t("Please eliminate URLs in your comment or name, or replace '.' with '-' in order to post links. This is an anti-spam measure. Thanks."));
         }
       }
           break;
