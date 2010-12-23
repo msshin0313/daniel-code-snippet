@@ -89,17 +89,25 @@ function michiza_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 function michiza_most_popular() {
+  $num = 5;
   $sql = "SELECT COUNT(path) AS hits, SUBSTR(path, 6) AS nid FROM {accesslog}
-		GROUP BY path WHERE uid<>1 AND path RLIKE '^node/[0-9]+$' ORDER BY hits DESC LIMIT 100";
+    WHERE uid<>1 AND path RLIKE '^node/[0-9]+$' GROUP BY path ORDER BY hits DESC LIMIT 100";
   $rec = db_query($sql);
-  $list = array();
-  // note: use this algorithm, then some "sticky" might not get displayed.
+  $list_sticky = array();
+  $list_hits = array();
   while ($stats = db_fetch_object($rec)) {
     $node = node_load($stats->nid);
-    if ( ($node->type == 'blog' && $stats->hits > 1) || $node->sticky == 1) {
-      $list[] = l($node->title, $node->path);
+    if ($node->sticky == 1) {
+      $list_sticky[] = l($node->title, $node->path);
+    } else if ($node->type == 'blog' && $stats->hits > 5) {
+      $list_hits[] = l($node->title, $node->path);
     }
-    if (count($list) >= 10) break;
+  }
+  if (count($list_sticky) >= $num) {
+    $list = $list_sticky;
+  } else {
+    $list_hits = array_slice($list_hits, 0, $num-count($list_sticky));
+    $list = array_merge($list_sticky, $list_hits);
   }
   return theme("item_list", $list);
 }
