@@ -112,3 +112,9 @@ function michiza_most_popular() {
   return theme("item_list", $list);
 }
 
+function theme_feed_icon($url, $title) {
+  if ($image = theme('image', 'misc/feed.png', t('Syndicate content'), t("Subscribe RSS"))) {
+    return '<a href="'. url("blog/feed") .'" class="feed-icon">'. $image .'</a>' . l(t("Subscribe RSS feed"), "blog/feed");
+  }
+}
+
