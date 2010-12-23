@@ -97,9 +97,9 @@ function michiza_most_popular() {
   $list_hits = array();
   while ($stats = db_fetch_object($rec)) {
     $node = node_load($stats->nid);
-    if ($node->sticky == 1) {
+    if ($node->type == 'blog' && $node->status == 1 && $node->sticky == 1) {
       $list_sticky[] = l($node->title, $node->path);
-    } else if ($node->type == 'blog' && $stats->hits > 5) {
+    } else if ($node->type == 'blog' && $node->status == 1 && $stats->hits > 5) {
       $list_hits[] = l($node->title, $node->path);
     }
   }
