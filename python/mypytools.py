@@ -1,5 +1,5 @@
 # for jython use: remove the encoding gbk. otherwise, add it.
-import random, csv, math, shutil, os, fnmatch, os.path
+import random, csv, math, shutil, os, fnmatch, os.path, itertools
 
 # p and q are lists of discrete random variable distributions.
 def kl_divergence(p, q):
@@ -94,19 +94,27 @@ def multinomial_distribution(pdf):
       r = r - pdf[i]
   assert False
 
-
-def simulate_random_guess():
-  trials = 1000000
-  pool = [0 for i in range(37)] + [1 for i in range(3)] + [2 for i in range(181)] + [3 for i in range(57)]
+# given the dist_pool, test accuracy on random guess and simulation
+# dist_pool = [0 for i in range(37)] + [1 for i in range(3)] + [2 for i in range(181)] + [3 for i in range(57)]
+def simulate_random_guess(dist_pool, trials=100000):
   simulation = []
   guess = []
   for i in range(trials):
-    simulation.append(random.choice(pool))
+    simulation.append(random.choice(dist_pool))
     #guess.append(random.randint(0,3))
-    guess.append(random.choice(pool))
+    guess.append(random.choice(dist_pool))
   correct = [t[0]==t[1] for t in zip(simulation, guess)].count(True)
   print "Correct guesses: %3.2f%%" % (float(correct)/trials*100)
 
+# given the dist_pool to generate random guesses, test over the testing set
+# eg. dist_pool=[0,1], testing_set= [0,]*20+[1,]*30
+def simulate_random_guess_set(dist_pool, testing_set, trials=100000):
+  correct = 0
+  for i in range(trials):
+    for testpoint in testing_set:
+      if testpoint == random.choice(dist_pool): 
+        correct += 1
+  print "Correct guesses: %3.2f%%" % (float(correct)/(trials*len(testing_set)) * 100)
 
 # write csv
 def write_csv(filename, header, rows):
@@ -194,4 +202,6 @@ if __name__ == '__main__':
   #remove_empty_lines('../data/termsusage_v2.1.txt')
   #count_lines(r'D:\Work\+project\balance\digg_cls\classification_algorithm', '*.m')
   #simulate_random_guess()
-  for i in range(100): print multinomial_distribution([0.02, 0.48, 0.0001, 0.4999])
+  #for i in range(100): print multinomial_distribution([0.02, 0.48, 0.0001, 0.4999])
+  #simulate_random_guess_set([1,]*234+[0,]*73, [1,]*234+[0,]*73, 1000000)
+  simulate_random_guess_set([1,]*62+[0,]*69+[1,]*234+[0,]*73, [1,]*62+[0,]*69+[1,]*234+[0,]*73)
