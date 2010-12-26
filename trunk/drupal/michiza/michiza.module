@@ -130,3 +130,17 @@ function michiza_project_page_link_alter(&$links, $node) {
 function michiza_link_alter(&$links, $node) {
   unset($links['blog_usernames_blog']);
 }
+
+function michiza_filter($op, $delta = 0, $format = -1, $text = '') {
+  switch($op) {
+    case 'list':
+      return array(0 => t('GMap Address Filter'));
+    case 'process':
+      preg_replace_callback('/\[!gmap-addr:(.*)\]/', _michiza_filter_wrap, $text);
+      
+  }
+}
+
+function _michiza_filter_wrap($matches) {
+  return '<a href=http://maps.google.com/maps?q='. check_url($matches[1]) .'>'. $matches[1] .'</a>';
+}
