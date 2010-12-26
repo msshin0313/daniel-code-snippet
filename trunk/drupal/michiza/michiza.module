@@ -43,8 +43,8 @@ function michiza_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 
 function michiza_cron() {
   // periodically set the site slogan
-  $quote = db_result(db_query("SELECT title FROM {node} WHERE status=1 AND type='quotes' ORDER BY rand() LIMIT 1"));
-  variable_set('site_slogan', $quote);
+  /*$quote = db_result(db_query("SELECT title FROM {node} WHERE status=1 AND type='quotes' ORDER BY rand() LIMIT 1"));
+  variable_set('site_slogan', $quote);*/
 }
 
 
@@ -112,9 +112,21 @@ function michiza_most_popular() {
   return theme("item_list", $list);
 }
 
-function theme_feed_icon($url, $title) {
+// should be placed in the template file.
+// implemented as pixture_reloaded_feed_icon
+/*function michiza_feed_icon($url, $title) {
   if ($image = theme('image', 'misc/feed.png', t('Syndicate content'), t("Subscribe RSS"))) {
     return '<a href="'. url("blog/feed") .'" class="feed-icon">'. $image .'</a>' . l(t("Subscribe RSS feed"), "blog/feed");
   }
 }
+*/
 
+function michiza_project_page_link_alter(&$links, $node) {
+  unset($links['development']['links']['pending_patches']);
+  $links['development']['links']['view_issues'] = l(t('View open issues'), 'project/issues/'.$node->project['uri']);
+  $links['development']['links']['create_issue'] = l(t('Create a new issue'), 'node/add/project-issue/'.$node->project['uri']);
+}
+
+function michiza_link_alter(&$links, $node) {
+  unset($links['blog_usernames_blog']);
+}
