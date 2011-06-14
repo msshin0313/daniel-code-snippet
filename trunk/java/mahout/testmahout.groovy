@@ -21,12 +21,17 @@ user, item, rating
 
  */
 
+import org.apache.commons.dbcp.BasicDataSourceFactory
+import org.apache.commons.dbcp.BasicDataSource
+
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel
+import org.apache.mahout.cf.taste.impl.model.jdbc.SQL92JDBCDataModel
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
 import org.apache.mahout.cf.taste.model.DataModel
+import org.apache.mahout.cf.taste.model.JDBCDataModel
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity
 import org.apache.mahout.cf.taste.similarity.UserSimilarity
@@ -56,6 +61,25 @@ def Item2Item() {
     println recommender.estimatePreference(1, 6)
 }
 
+def JDBCItem2Item() {
+    // SQLite JDBC has problems. And can't work
+    Properties dbProperties = new Properties();
+    //dbProperties.put("driverClassName", "org.sqlite.JDBC")
+    //dbProperties.put("url", "jdbc:sqlite:/home/daniel/Development/snippet/java/mahout/sqlite.db")
+
+    dbProperties.put("driverClassName", "com.mysql.jdbc.Driver")
+    dbProperties.put("url", "jdbc:mysql://localhost/dev")
+    dbProperties.put("username", "dev")
+    dbProperties.put("password", "dev")
+
+    BasicDataSource dataSource = BasicDataSourceFactory.createDataSource(dbProperties);
+    //dataSource.setMaxActive(1)
+    JDBCDataModel model = new SQL92JDBCDataModel(dataSource, "ratings", "user", "item", "rating", "");
+
+    ItemSimilarity itemSimilarity = new PearsonCorrelationSimilarity(model);
+    GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model, itemSimilarity);
+    println recommender.estimatePreference(1, 6);
+}
 
 
-Item2Item()
+JDBCItem2Item()
