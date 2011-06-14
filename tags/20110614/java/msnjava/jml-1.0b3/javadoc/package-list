@@ -1,0 +1,13 @@
+net.sf.jml
+net.sf.jml.event
+net.sf.jml.exception
+net.sf.jml.impl
+net.sf.jml.message
+net.sf.jml.message.invitation
+net.sf.jml.message.p2p
+net.sf.jml.protocol
+net.sf.jml.protocol.incoming
+net.sf.jml.protocol.msnftp
+net.sf.jml.protocol.msnslp
+net.sf.jml.protocol.outgoing
+net.sf.jml.util

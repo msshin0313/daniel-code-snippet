@@ -1,0 +1,7 @@
+<project name="warez" default="compile" basedir=".">
+  <property name="src" location="src"/>
+  <target name="compile">
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${basedir}" source="1.4"/>
+  </target>
+</project>

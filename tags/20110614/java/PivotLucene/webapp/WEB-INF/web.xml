@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4"
+         xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" >
+    <description>Developed by the University of Michigan School of Information.
+        http://pivots.cms.si.umich.edu
+    </description>
+    <display-name>The Pivots Application</display-name>
+
+    <servlet>
+        <description>The facade of the pivot lucene.</description>
+        <display-name>HttpControl</display-name>
+        <servlet-name>HttpControl</servlet-name>
+        <servlet-class>edu.umich.si.cms.pivots.lucene.HttpControl</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServletDemo</servlet-name>
+        <servlet-class>test.ServletDemo</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HttpControl</servlet-name>
+        <url-pattern>/control</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServletDemo</servlet-name>
+        <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+
+</web-app>
