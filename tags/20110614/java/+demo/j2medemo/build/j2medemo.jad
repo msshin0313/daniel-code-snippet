@@ -1,0 +1,10 @@
+MIDlet-Jar-URL: j2medemo.jar
+MIDlet-Jar-Size: 8633
+MIDlet-Name: j2medemo
+MIDlet-Vendor: Dan
+MIDlet-Version: 1.0.0
+MIDlet-1: Increment, , demo.Increment
+MIDlet-2: MethodTimes, , demo.MethodTimes
+MIDlet-3: RMSGameScores, , demo.RMSGameScores
+MIDlet-4: HttpTest, , demo.HttpTest
+HttpTest.URL: http://zhou_xiaodan/test/hit
