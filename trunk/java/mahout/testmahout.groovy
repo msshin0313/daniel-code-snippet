@@ -21,18 +21,20 @@ user, item, rating
 
  */
 
-import org.apache.commons.dbcp.BasicDataSourceFactory
 import org.apache.commons.dbcp.BasicDataSource
-
+import org.apache.commons.dbcp.BasicDataSourceFactory
+import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel
-import org.apache.mahout.cf.taste.impl.model.jdbc.SQL92JDBCDataModel
+import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
+import org.apache.mahout.cf.taste.impl.similarity.GenericItemSimilarity
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
 import org.apache.mahout.cf.taste.model.DataModel
 import org.apache.mahout.cf.taste.model.JDBCDataModel
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood
+import org.apache.mahout.cf.taste.recommender.RecommendedItem
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity
 import org.apache.mahout.cf.taste.similarity.UserSimilarity
 
@@ -74,11 +76,61 @@ def JDBCItem2Item() {
 
     BasicDataSource dataSource = BasicDataSourceFactory.createDataSource(dbProperties);
     //dataSource.setMaxActive(1)
-    JDBCDataModel model = new SQL92JDBCDataModel(dataSource, "ratings", "user", "item", "rating", "");
+    JDBCDataModel model = new MySQLJDBCDataModel(dataSource, "ratings", "user", "item", "rating", "updated");
 
     ItemSimilarity itemSimilarity = new PearsonCorrelationSimilarity(model);
     GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model, itemSimilarity);
     println recommender.estimatePreference(1, 6);
+    recommender.refresh(null);
+}
+
+
+// not working code. pseudo code!!!
+def RecommenderInitialUpdateOffline() {
+    // first-time running the recommender
+    JDBCDataModel model = new MySQLJDBCDataModel(dataSource, "ratings", "user_id", "item_id", "rating", "updated");
+    ItemSimilarity itemSimilarity = new PearsonCorrelationSimilarity(model);
+    GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model, itemSimilarity);
+    // print a prediction score for user-item.
+    println recommender.estimatePreference(user_id, item_id);
+
+    // compute the initial item-similarity data and persistence them. time-consuming.
+    LongPrimitiveIterator iterator = model.getItemIDs();
+    while (iterator.hasNext()) {
+        long itemID1 = iterator.nextLong();
+        for (RecommendedItem item : recommender.mostSimilarItems(itemID1, maxKeep)) {
+            long itemID2 = item.getItemID();
+            double score = item.getValue();
+            // save the item-simiarity data in file or database.
+            saveSimilarity(itemID1, itemID2, score);
+        }
+    }
+}
+
+def RecommenderIncrementalUpdate() {
+    // in incremental update, we still need to initialize these objects to compute similarity/preference data for new users/items
+    JDBCDataModel model = new MySQLJDBCDataModel(dataSource, "ratings", "user_id", "item_id", "rating", "updated");
+    ItemSimilarity itemSimilarity = new PearsonCorrelationSimilarity(model);
+    GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model, itemSimilarity);
+
+    // incrementally compute and save similarity data for new items.
+    // existing similarity data is relatively stable, and we won't touch them. thus we can save lots of computation time.
+    List<Long> newItems = loadNewItems();
+    for (long itemID1 : newItems) {
+        for (RecommendedItem item : recommender.mostSimilarItems(itemID1, maxKeep)) {
+            long itemID2 = item.getItemID();
+            double score = item.getValue();
+            // append the new item-simiarity data in file or database.
+            saveSimilarity(itemID1, itemID2, score);
+        }
+    }
+
+    // reload all similarity data from persistent storage.
+    List<GenericItemSimilarity.ItemItemSimilarity> ii = loadSimilarity();
+    GenericItemSimilarity reloadSimilarity = new GenericItemSimilarity(ii);
+    GenericItemBasedRecommender reloadRecommender = new GenericItemBasedRecommender(model, reloadSimilarity);
+    // print a prediction score for user-item
+    println recommender.estimatePreference(user_id, item_id);
 }
 
 
