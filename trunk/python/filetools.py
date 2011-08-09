@@ -143,4 +143,4 @@ if __name__ == '__main__':
   #show_dir_info(r'N:/+Data')
   #t = create_temp()
   #flatten_dir(r'c:\users\daniel\appdata\local\temp\tmpozpzku')
-  randomize_index_files(r'c:\users\daniel\appdata\local\temp\tmpozpzku')
+  randomize_index_files(r'/media/Mobile/system/Pic/Many')
