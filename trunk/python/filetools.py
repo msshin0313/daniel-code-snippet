@@ -118,6 +118,31 @@ def randomize_index_files(topdir, delim='@'):
   print "Randomizing finish successfully."
 
 
+def reverse_randomized_files(topdir, delim='@'):
+  assert os.path.exists(topdir) and os.path.isdir(topdir) and len(delim)==1, dir
+  old_files = os.listdir(topdir)
+  assert len(old_files) > 0, "Dir empty"
+  new_files = []
+  for f in old_files:
+    if not os.path.isfile(os.path.join(topdir, f)):
+      print "Please use flatten_dir() first. The dir can't have sub-dirs."
+      print "Nothing is done. Exit."
+      return
+    m = re.match('[0-9]{6}'+delim+'(.+)', f)
+    if m != None: f = m.group(1)
+    new_files.append(f)
+  assert len(old_files) == len(new_files)
+  assert len(new_files) == len(set(new_files)), 'You have duplicate files names after reverse randomize.'
+  show_dir_info(topdir)
+  ok = raw_input("Reverse randomized files? Press y to continue:")
+  if ok != 'y':
+    print "OK. Nothing is done. Exit."
+    return
+  for i in range(len(old_files)):
+    shutil.move(os.path.join(topdir, old_files[i]), os.path.join(topdir, new_files[i]))
+  print "Reverse randomizing finish successfully."
+
+
 # display dir information. show total # of dirs/files. and randomly display 10.  
 def show_dir_info(dir):
   assert os.path.exists(dir) and os.path.isdir(dir), dir
@@ -143,4 +168,5 @@ if __name__ == '__main__':
   #show_dir_info(r'N:/+Data')
   #t = create_temp()
   #flatten_dir(r'c:\users\daniel\appdata\local\temp\tmpozpzku')
-  randomize_index_files(r'/media/Mobile/system/Pic/Many')
+  randomize_index_files(r'/media/Mobile/system/_processing/coolios')
+  #reverse_randomized_files(r'/media/Mobile/system/_processing/coolios')
