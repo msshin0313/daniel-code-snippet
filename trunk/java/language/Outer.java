@@ -3,7 +3,7 @@ package language;
 public class Outer {
     private int id;
 
-    /*public static class Inner {
+    public static class Inner {
         private int id;
 
         public void run() {
@@ -18,13 +18,13 @@ public class Outer {
         Inner inner = new Inner();
         inner.id = 10;
         System.out.println(inner.id);
-    }*/
+    }
 
     public static void main(String[] args) {
-        /*Outer outer = new Outer();
+        Outer outer = new Outer();
         outer.run();
         Inner inner = new Inner();
-        inner.run();*/
+        inner.run();
         System.out.println("Hello, world");
     }
 }
