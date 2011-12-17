@@ -168,5 +168,5 @@ if __name__ == '__main__':
   #show_dir_info(r'N:/+Data')
   #t = create_temp()
   #flatten_dir(r'c:\users\daniel\appdata\local\temp\tmpozpzku')
-  randomize_index_files(r'/media/Mobile/system/_processing/hu2-1')
+  randomize_index_files(r'/media/Mobile/system/_processing/hu5')
   #reverse_randomized_files(r'/media/Mobile/system/_processing/coolios')
