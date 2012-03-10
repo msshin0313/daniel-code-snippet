@@ -159,7 +159,32 @@ def show_dir_info(dir):
   random.shuffle(combined)
   print "10 random files/dirs:"
   for c in combined[:10]: print c
-    
+
+
+
+def split_folder(dir, num = 2000):
+  assert os.path.exists(dir) and os.path.isdir(dir), dir
+  files = os.listdir(dir)
+  # filter for sub folders
+  for f in files:
+    if not os.path.isfile(os.path.join(dir, f)):
+      print "The dir can't have sub-dirs."
+      print "Nothing is done. Exit."
+      return
+  # move file  
+  show_dir_info(dir)
+  ok = raw_input("Split folder? Press y to continue:")
+  if ok != 'y':
+    print "OK. Nothing is done. Exit."
+    return
+  for i, fn in enumerate(files):
+    if i % num == 0:
+      dest = os.path.join(dir, str(i/num))
+      os.mkdir(dest)
+    shutil.move(os.path.join(dir, fn), os.path.join(dest, fn))
+  print "Split folder successfully."
+  
+
 
 if __name__ == '__main__':
   #rename_by_list('M:/list.txt', 'M:/tonghua')
@@ -168,5 +193,6 @@ if __name__ == '__main__':
   #show_dir_info(r'N:/+Data')
   #t = create_temp()
   #flatten_dir(r'c:\users\daniel\appdata\local\temp\tmpozpzku')
-  randomize_index_files(r'/media/Mobile/system/_processing/hu5')
+  #randomize_index_files(r'/home/daniel/Pictures/hu_all')
   #reverse_randomized_files(r'/media/Mobile/system/_processing/coolios')
+  split_folder(r'/home/daniel/Pictures/hu_all')

@@ -23,6 +23,7 @@ user, item, rating
 
 import org.apache.commons.dbcp.BasicDataSource
 import org.apache.commons.dbcp.BasicDataSourceFactory
+import org.apache.mahout.cf.taste.eval.RecommenderBuilder
 import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel
@@ -37,6 +38,9 @@ import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood
 import org.apache.mahout.cf.taste.recommender.RecommendedItem
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity
 import org.apache.mahout.cf.taste.similarity.UserSimilarity
+import org.apache.mahout.cf.taste.recommender.Recommender
+import org.apache.mahout.cf.taste.eval.RecommenderEvaluator
+import org.apache.mahout.cf.taste.impl.eval.RMSRecommenderEvaluator
 
 def User2User() {
     DataModel model = new FileDataModel(new File("data.txt"));
@@ -133,5 +137,30 @@ def RecommenderIncrementalUpdate() {
     println recommender.estimatePreference(user_id, item_id);
 }
 
+/**
+ * see https://cwiki.apache.org/confluence/display/MAHOUT/Recommender+Documentation
+ */
+def Evaluation() {
+    DataModel dataModel = new FileDataModel(new File("data.txt"));
+    RecommenderBuilder userBasedRecommenderBuilder = new RecommenderBuilder() {
+        public Recommender buildRecommender(DataModel model) {
+            UserSimilarity userSimilarity = new PearsonCorrelationSimilarity(model);
+            UserNeighborhood neighborhood = new NearestNUserNeighborhood(10, userSimilarity, model);
+            GenericUserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
+            return recommender;
+        }
+    }
+    RecommenderBuilder itemBasedRecommenderBuilder = new RecommenderBuilder() {
+        public Recommender buildRecommender(DataModel model) {
+            ItemSimilarity itemSimilarity = new PearsonCorrelationSimilarity(model);
+            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model, itemSimilarity);
+            return recommender;
+        }
+    }
+    RecommenderEvaluator evaluator = new RMSRecommenderEvaluator();
+    println evaluator.evaluate(itemBasedRecommenderBuilder, null, dataModel, 0.5, 0.5);
+}
 
-JDBCItem2Item()
+
+//JDBCItem2Item()
+Evaluation()
