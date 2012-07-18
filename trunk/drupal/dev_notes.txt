@@ -1,5 +1,0 @@
-DRUPAL DEVELOPMENT NOTE:
-
-Modules:
-
-APIs:
