@@ -1,6 +1,0 @@
-<project name="test" default="touch">
-  <target name="touch">
-    <touch file=".reload"/>
-  </target>
-</project>
-
