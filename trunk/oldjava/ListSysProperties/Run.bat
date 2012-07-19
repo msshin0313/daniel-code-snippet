@@ -1,1 +1,0 @@
-java ListSysProperties > sys.txt
